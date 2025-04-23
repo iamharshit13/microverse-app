@@ -11,10 +11,10 @@ services:
     env_file:
       - .env
 
-  fastapi-service:
-    build: ./services/fastapi-service
-    container_name: fastapi-service
+  recommendation-service:
+    build: ./services/recommendation-service
+    container_name: recommendation-service
     ports:
-      - "8001:8000"
+      - "8001:8001"
     volumes:
-      - ./services/fastapi-service:/app
+      - ./services/recommendation-service:/app
