@@ -1,1 +1,13 @@
 # Docker Compose config
+version: '3.8'
+
+services:
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/user-service:/app
+    env_file:
+      - .env
