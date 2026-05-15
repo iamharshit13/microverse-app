@@ -1,1 +1,6 @@
-{ "name": "frontend" }
+{
+  "name": "microverse-poc-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static frontend for the Microverse recommendation POC."
+}

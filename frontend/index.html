@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Microverse POC</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17202a;
+        --muted: #617080;
+        --line: #d8e0e8;
+        --panel: #ffffff;
+        --accent: #0f766e;
+        --accent-dark: #115e59;
+        --wash: #f4f7fb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--wash);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      header {
+        background: #102a43;
+        color: #fff;
+        padding: 28px clamp(18px, 5vw, 56px);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 46px);
+        font-weight: 760;
+      }
+
+      header p {
+        max-width: 760px;
+        margin: 10px 0 0;
+        color: #d9e8f5;
+        line-height: 1.55;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+        gap: 22px;
+        padding: 24px clamp(18px, 5vw, 56px) 48px;
+      }
+
+      section,
+      .recommendation {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: 0 10px 28px rgba(16, 42, 67, 0.08);
+      }
+
+      section {
+        padding: 20px;
+      }
+
+      h2 {
+        margin: 0 0 16px;
+        font-size: 18px;
+      }
+
+      label {
+        display: block;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      input,
+      select {
+        width: 100%;
+        margin-top: 6px;
+        padding: 11px 12px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        border-radius: 6px;
+        background: var(--accent);
+        color: white;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        padding: 11px 14px;
+      }
+
+      button:hover {
+        background: var(--accent-dark);
+      }
+
+      .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .button-row button {
+        flex: 1;
+      }
+
+      .secondary {
+        background: #334e68;
+      }
+
+      .secondary:hover {
+        background: #243b53;
+      }
+
+      .status {
+        min-height: 22px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .recommendations {
+        display: grid;
+        gap: 14px;
+      }
+
+      .recommendation {
+        padding: 16px;
+      }
+
+      .recommendation h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 12px 0;
+      }
+
+      .tag {
+        border-radius: 999px;
+        background: #e0f2f1;
+        color: #0f514c;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 8px;
+      }
+
+      .feedback {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .feedback button {
+        background: #edf2f7;
+        color: var(--ink);
+        padding: 8px 10px;
+      }
+
+      .feedback button:hover {
+        background: #d9e2ec;
+      }
+
+      @media (max-width: 820px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Microverse</h1>
+      <p>Working POC for event-driven personalization: create a user, fetch AI-ranked recommendations, send feedback, and watch the profile update loop respond.</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>User Session</h2>
+        <label for="username">Username</label>
+        <input id="username" autocomplete="username" value="ai_builder">
+
+        <label for="email">Email</label>
+        <input id="email" autocomplete="email" value="ai_builder@example.com">
+
+        <label for="password">Password</label>
+        <input id="password" autocomplete="current-password" type="password" value="microverse123">
+
+        <label for="context">Recommendation context</label>
+        <select id="context">
+          <option value="">General</option>
+          <option value="genai">GenAI</option>
+          <option value="backend">Backend</option>
+          <option value="redis">Redis</option>
+          <option value="frontend">Frontend</option>
+        </select>
+
+        <div class="button-row">
+          <button id="register">Register</button>
+          <button class="secondary" id="login">Login</button>
+        </div>
+        <button class="secondary" id="refresh" style="width: 100%; margin-top: 10px;">Refresh Recommendations</button>
+        <div class="status" id="status">Ready.</div>
+      </section>
+
+      <section>
+        <h2>Recommendations</h2>
+        <div class="recommendations" id="recommendations"></div>
+      </section>
+    </main>
+
+    <script>
+      const apiBase = "http://localhost:8080";
+      const state = {
+        userId: null,
+        username: null,
+      };
+
+      const statusEl = document.querySelector("#status");
+      const recommendationsEl = document.querySelector("#recommendations");
+
+      function setStatus(message) {
+        statusEl.textContent = message;
+      }
+
+      function credentials() {
+        return {
+          username: document.querySelector("#username").value.trim(),
+          email: document.querySelector("#email").value.trim(),
+          password: document.querySelector("#password").value,
+        };
+      }
+
+      async function postJson(path, payload) {
+        const response = await fetch(`${apiBase}${path}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail?.error || data.error || JSON.stringify(data));
+        }
+        return data;
+      }
+
+      async function register() {
+        setStatus("Creating user and publishing Kafka event...");
+        const data = await postJson("/api/user/register/", credentials());
+        state.userId = data.user_id;
+        state.username = data.username;
+        setStatus(`Registered ${data.username} as user #${data.user_id}.`);
+        setTimeout(loadRecommendations, 1200);
+      }
+
+      async function login() {
+        setStatus("Logging in...");
+        const { username, password } = credentials();
+        const data = await postJson("/api/user/login/", { username, password });
+        state.userId = data.user_id;
+        state.username = data.username;
+        setStatus(`Logged in as ${data.username}.`);
+        await loadRecommendations();
+      }
+
+      async function loadRecommendations() {
+        if (!state.userId) {
+          setStatus("Register or login first.");
+          return;
+        }
+
+        const context = document.querySelector("#context").value;
+        const query = new URLSearchParams({ limit: "5" });
+        if (context) query.set("context", context);
+
+        setStatus("Fetching ranked recommendations...");
+        const response = await fetch(`${apiBase}/api/recommendations/${state.userId}?${query}`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || "Could not load recommendations");
+        }
+        renderRecommendations(data.recommendations || []);
+        setStatus(`Loaded ${data.recommendations.length} recommendations from ${data.model}.`);
+      }
+
+      async function sendFeedback(itemId, eventType, rating) {
+        if (!state.userId) return;
+        const context = document.querySelector("#context").value || null;
+        setStatus(`Recording ${eventType} feedback...`);
+        const data = await postJson("/api/events/interaction", {
+          user_id: state.userId,
+          item_id: itemId,
+          event_type: eventType,
+          rating,
+          context,
+        });
+        renderRecommendations(data.next_best_recommendations || []);
+        setStatus(`Profile updated: [${data.updated_profile_vector.join(", ")}]`);
+      }
+
+      function renderRecommendations(items) {
+        if (!items.length) {
+          recommendationsEl.innerHTML = "<p class=\"meta\">No recommendations yet.</p>";
+          return;
+        }
+
+        recommendationsEl.innerHTML = items.map((item) => `
+          <article class="recommendation">
+            <h3>${item.title}</h3>
+            <div class="meta">Score ${item.score} | Similarity ${item.signals.semantic_similarity} | Popularity ${item.signals.popularity}</div>
+            <div class="tags">
+              ${item.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
+            </div>
+            <div class="feedback">
+              <button data-item="${item.item_id}" data-event="view" data-rating="2">View</button>
+              <button data-item="${item.item_id}" data-event="like" data-rating="4">Like</button>
+              <button data-item="${item.item_id}" data-event="complete" data-rating="5">Complete</button>
+            </div>
+          </article>
+        `).join("");
+      }
+
+      document.querySelector("#register").addEventListener("click", () => register().catch((error) => setStatus(error.message)));
+      document.querySelector("#login").addEventListener("click", () => login().catch((error) => setStatus(error.message)));
+      document.querySelector("#refresh").addEventListener("click", () => loadRecommendations().catch((error) => setStatus(error.message)));
+      recommendationsEl.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-item]");
+        if (!button) return;
+        sendFeedback(button.dataset.item, button.dataset.event, Number(button.dataset.rating)).catch((error) => setStatus(error.message));
+      });
+
+      renderRecommendations([]);
+    </script>
+  </body>
+</html>

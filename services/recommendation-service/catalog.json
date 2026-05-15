@@ -1,0 +1,58 @@
+[
+  {
+    "item_id": "ml-foundations",
+    "title": "Machine Learning Foundations",
+    "tags": ["ml", "python", "beginner"],
+    "vector": [0.95, 0.15, 0.1, 0.15, 0.05],
+    "popularity": 0.82
+  },
+  {
+    "item_id": "llm-prompt-engineering",
+    "title": "LLM Prompt Engineering Lab",
+    "tags": ["llm", "genai", "prompting"],
+    "vector": [0.8, 0.25, 0.15, 0.85, 0.2],
+    "popularity": 0.91
+  },
+  {
+    "item_id": "vector-databases",
+    "title": "Vector Databases and Semantic Search",
+    "tags": ["rag", "embeddings", "search"],
+    "vector": [0.75, 0.35, 0.15, 0.65, 0.55],
+    "popularity": 0.87
+  },
+  {
+    "item_id": "cloud-native-kafka",
+    "title": "Cloud-Native Kafka Event Streaming",
+    "tags": ["kafka", "microservices", "backend"],
+    "vector": [0.3, 0.95, 0.25, 0.1, 0.35],
+    "popularity": 0.78
+  },
+  {
+    "item_id": "redis-feature-store",
+    "title": "Redis Feature Store Patterns",
+    "tags": ["redis", "feature-store", "caching"],
+    "vector": [0.35, 0.85, 0.25, 0.15, 0.75],
+    "popularity": 0.72
+  },
+  {
+    "item_id": "frontend-ai-ux",
+    "title": "AI UX for Personalized Frontends",
+    "tags": ["frontend", "personalization", "ux"],
+    "vector": [0.25, 0.2, 0.95, 0.45, 0.25],
+    "popularity": 0.69
+  },
+  {
+    "item_id": "rag-production",
+    "title": "Production RAG Systems",
+    "tags": ["rag", "llm", "backend"],
+    "vector": [0.7, 0.6, 0.2, 0.82, 0.6],
+    "popularity": 0.88
+  },
+  {
+    "item_id": "mlops-monitoring",
+    "title": "MLOps Monitoring and Drift Detection",
+    "tags": ["mlops", "monitoring", "model-evaluation"],
+    "vector": [0.72, 0.55, 0.15, 0.4, 0.8],
+    "popularity": 0.74
+  }
+]

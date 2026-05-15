@@ -1,4 +1,8 @@
 Django
 djangorestframework
 djangorestframework-simplejwt
+fastapi
+uvicorn
+redis
 kafka-python
+httpx
