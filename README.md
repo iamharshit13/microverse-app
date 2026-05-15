@@ -168,6 +168,16 @@ The POC proves the main loop:
 Frontend -> API Gateway -> Django User Service -> Kafka -> FastAPI Recommendation AI Service -> Redis -> Frontend
 ```
 
+## Local Smoke Tests
+
+The recommendation engine has a lightweight standard-library test suite that does not require Docker:
+
+```bash
+python3 -m unittest tests/test_recommendation_service.py
+```
+
+It checks catalog metadata, ranking order, feedback-based profile updates, and Redis-cache serialization with a fake in-memory Redis client.
+
 ## Example Flow
 
 1. Register a user through the Django user service.

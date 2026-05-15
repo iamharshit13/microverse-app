@@ -66,6 +66,16 @@ async def recommendations(user_id: int, context: str | None = None, limit: int =
     return await forward_json("GET", f"{RECOMMENDATION_SERVICE_URL}/recommendations/{user_id}", params=params)
 
 
+@app.get("/api/profiles/{user_id}")
+async def profile(user_id: int) -> Any:
+    return await forward_json("GET", f"{RECOMMENDATION_SERVICE_URL}/profiles/{user_id}")
+
+
+@app.get("/api/catalog")
+async def catalog() -> Any:
+    return await forward_json("GET", f"{RECOMMENDATION_SERVICE_URL}/catalog")
+
+
 @app.post("/api/events/interaction")
 async def interaction(request: Request) -> Any:
     payload = await request.json()

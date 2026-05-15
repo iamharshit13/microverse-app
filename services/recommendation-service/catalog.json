@@ -2,6 +2,11 @@
   {
     "item_id": "ml-foundations",
     "title": "Machine Learning Foundations",
+    "description": "A practical introduction to supervised learning, evaluation metrics, and model iteration in Python.",
+    "category": "Machine Learning",
+    "difficulty": "Beginner",
+    "duration": "4h",
+    "provider": "Microverse Labs",
     "tags": ["ml", "python", "beginner"],
     "vector": [0.95, 0.15, 0.1, 0.15, 0.05],
     "popularity": 0.82
@@ -9,6 +14,11 @@
   {
     "item_id": "llm-prompt-engineering",
     "title": "LLM Prompt Engineering Lab",
+    "description": "Hands-on prompt patterns for instruction design, structured outputs, tool use, and evaluation.",
+    "category": "Generative AI",
+    "difficulty": "Beginner",
+    "duration": "3h",
+    "provider": "Microverse Labs",
     "tags": ["llm", "genai", "prompting"],
     "vector": [0.8, 0.25, 0.15, 0.85, 0.2],
     "popularity": 0.91
@@ -16,6 +26,11 @@
   {
     "item_id": "vector-databases",
     "title": "Vector Databases and Semantic Search",
+    "description": "Build semantic retrieval with embeddings, approximate nearest neighbor search, and metadata filters.",
+    "category": "Search",
+    "difficulty": "Intermediate",
+    "duration": "5h",
+    "provider": "Vector Systems School",
     "tags": ["rag", "embeddings", "search"],
     "vector": [0.75, 0.35, 0.15, 0.65, 0.55],
     "popularity": 0.87
@@ -23,6 +38,11 @@
   {
     "item_id": "cloud-native-kafka",
     "title": "Cloud-Native Kafka Event Streaming",
+    "description": "Design event-driven microservices with Kafka topics, consumer groups, retries, and observability.",
+    "category": "Backend",
+    "difficulty": "Intermediate",
+    "duration": "6h",
+    "provider": "Distributed Systems Guild",
     "tags": ["kafka", "microservices", "backend"],
     "vector": [0.3, 0.95, 0.25, 0.1, 0.35],
     "popularity": 0.78
@@ -30,6 +50,11 @@
   {
     "item_id": "redis-feature-store",
     "title": "Redis Feature Store Patterns",
+    "description": "Use Redis for online features, low-latency ranking signals, counters, and cache invalidation.",
+    "category": "Infrastructure",
+    "difficulty": "Intermediate",
+    "duration": "4h",
+    "provider": "Microverse Labs",
     "tags": ["redis", "feature-store", "caching"],
     "vector": [0.35, 0.85, 0.25, 0.15, 0.75],
     "popularity": 0.72
@@ -37,6 +62,11 @@
   {
     "item_id": "frontend-ai-ux",
     "title": "AI UX for Personalized Frontends",
+    "description": "Design transparent recommendation interfaces, feedback controls, and adaptive product states.",
+    "category": "Frontend",
+    "difficulty": "Beginner",
+    "duration": "3h",
+    "provider": "Product AI Studio",
     "tags": ["frontend", "personalization", "ux"],
     "vector": [0.25, 0.2, 0.95, 0.45, 0.25],
     "popularity": 0.69
@@ -44,6 +74,11 @@
   {
     "item_id": "rag-production",
     "title": "Production RAG Systems",
+    "description": "Build retrieval augmented generation systems with chunking, reranking, citations, and quality checks.",
+    "category": "Generative AI",
+    "difficulty": "Advanced",
+    "duration": "7h",
+    "provider": "Applied LLM Institute",
     "tags": ["rag", "llm", "backend"],
     "vector": [0.7, 0.6, 0.2, 0.82, 0.6],
     "popularity": 0.88
@@ -51,8 +86,61 @@
   {
     "item_id": "mlops-monitoring",
     "title": "MLOps Monitoring and Drift Detection",
+    "description": "Track model quality, detect drift, monitor production metrics, and design rollback workflows.",
+    "category": "MLOps",
+    "difficulty": "Advanced",
+    "duration": "6h",
+    "provider": "ModelOps Academy",
     "tags": ["mlops", "monitoring", "model-evaluation"],
     "vector": [0.72, 0.55, 0.15, 0.4, 0.8],
     "popularity": 0.74
+  },
+  {
+    "item_id": "api-gateway-patterns",
+    "title": "API Gateway Patterns for Microservices",
+    "description": "Route service traffic, centralize CORS, compose APIs, and handle upstream failures gracefully.",
+    "category": "Backend",
+    "difficulty": "Intermediate",
+    "duration": "4h",
+    "provider": "Distributed Systems Guild",
+    "tags": ["api", "gateway", "microservices"],
+    "vector": [0.28, 0.9, 0.22, 0.12, 0.42],
+    "popularity": 0.76
+  },
+  {
+    "item_id": "recommendation-evaluation",
+    "title": "Recommendation Evaluation Metrics",
+    "description": "Evaluate ranking quality with precision@k, recall@k, NDCG, MAP, and online feedback loops.",
+    "category": "Recommender Systems",
+    "difficulty": "Intermediate",
+    "duration": "5h",
+    "provider": "Microverse Labs",
+    "tags": ["ranking", "evaluation", "recommendations"],
+    "vector": [0.82, 0.42, 0.2, 0.32, 0.7],
+    "popularity": 0.79
+  },
+  {
+    "item_id": "django-jwt-auth",
+    "title": "Django JWT Auth for Service Backends",
+    "description": "Implement registration, login, token issuance, auth middleware, and protected API endpoints.",
+    "category": "Backend",
+    "difficulty": "Beginner",
+    "duration": "3h",
+    "provider": "Web Backend School",
+    "tags": ["django", "jwt", "backend"],
+    "vector": [0.18, 0.82, 0.18, 0.08, 0.25],
+    "popularity": 0.71
+  },
+  {
+    "item_id": "observability-opentelemetry",
+    "title": "OpenTelemetry Observability Basics",
+    "description": "Instrument services with traces, metrics, structured logs, and service-level debugging workflows.",
+    "category": "Infrastructure",
+    "difficulty": "Intermediate",
+    "duration": "5h",
+    "provider": "ModelOps Academy",
+    "tags": ["observability", "opentelemetry", "monitoring"],
+    "vector": [0.32, 0.78, 0.16, 0.18, 0.86],
+    "popularity": 0.73
   }
 ]

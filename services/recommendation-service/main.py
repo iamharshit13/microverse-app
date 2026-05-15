@@ -1,8 +1,6 @@
 import asyncio
 import json
-import math
 import os
-import random
 import threading
 import time
 from pathlib import Path
@@ -13,6 +11,7 @@ from fastapi import FastAPI
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 from pydantic import BaseModel, Field
+from recommender import default_user_vector, load_catalog, rank_items, update_profile_vector
 
 
 app = FastAPI(
@@ -28,14 +27,7 @@ USER_EVENTS_TOPIC = os.getenv("USER_EVENTS_TOPIC", "user-events")
 CATALOG_PATH = Path(os.getenv("CATALOG_PATH", Path(__file__).with_name("catalog.json")))
 
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
-
-
-def load_catalog() -> list[dict[str, Any]]:
-    with CATALOG_PATH.open(encoding="utf-8") as catalog_file:
-        return json.load(catalog_file)
-
-
-ITEM_CATALOG = load_catalog()
+ITEM_CATALOG = load_catalog(CATALOG_PATH)
 
 
 class InteractionEvent(BaseModel):
@@ -44,31 +36,6 @@ class InteractionEvent(BaseModel):
     event_type: str = Field(default="view", examples=["view", "like", "complete"])
     rating: float | None = Field(default=None, ge=0, le=5)
     context: str | None = Field(default=None, examples=["learning", "backend", "genai"])
-
-
-def cosine_similarity(left: list[float], right: list[float]) -> float:
-    dot_product = sum(a * b for a, b in zip(left, right))
-    left_norm = math.sqrt(sum(a * a for a in left))
-    right_norm = math.sqrt(sum(b * b for b in right))
-    if left_norm == 0 or right_norm == 0:
-        return 0
-    return dot_product / (left_norm * right_norm)
-
-
-def default_user_vector(event_data: dict[str, Any] | None = None) -> list[float]:
-    if not event_data:
-        return [0.55, 0.45, 0.35, 0.50, 0.30]
-
-    username = event_data.get("username", "").lower()
-    email = event_data.get("email", "").lower()
-    text = f"{username} {email}"
-    return [
-        0.70 if any(term in text for term in ["ai", "ml", "data"]) else 0.45,
-        0.65 if any(term in text for term in ["dev", "api", "backend"]) else 0.40,
-        0.65 if any(term in text for term in ["design", "ui", "frontend"]) else 0.35,
-        0.70 if any(term in text for term in ["gpt", "llm", "gen"]) else 0.45,
-        0.55,
-    ]
 
 
 def profile_key(user_id: int) -> str:
@@ -90,39 +57,9 @@ def save_profile(profile: dict[str, Any]) -> None:
     r.set(profile_key(profile["user_id"]), json.dumps(profile))
 
 
-def context_boost(item: dict[str, Any], context: str | None) -> float:
-    if not context:
-        return 0
-    normalized_context = context.lower()
-    return 0.12 if normalized_context in item["tags"] or normalized_context in item["title"].lower() else 0
-
-
 def rank_recommendations(user_id: int, context: str | None = None, limit: int = 5) -> list[dict[str, Any]]:
     profile = load_profile(user_id)
-    user_vector = profile["vector"]
-    ranked_items = []
-
-    for item in ITEM_CATALOG:
-        semantic_score = cosine_similarity(user_vector, item["vector"])
-        popularity_score = item["popularity"] * 0.15
-        exploration_score = random.uniform(0, 0.03)
-        final_score = semantic_score + popularity_score + context_boost(item, context) + exploration_score
-        ranked_items.append(
-            {
-                "item_id": item["item_id"],
-                "title": item["title"],
-                "tags": item["tags"],
-                "score": round(final_score, 4),
-                "signals": {
-                    "semantic_similarity": round(semantic_score, 4),
-                    "popularity": item["popularity"],
-                    "context": context,
-                },
-            }
-        )
-
-    ranked_items.sort(key=lambda item: item["score"], reverse=True)
-    recommendations = ranked_items[:limit]
+    recommendations = rank_items(ITEM_CATALOG, profile["vector"], context, limit)
     r.set(recommendations_key(user_id), json.dumps(recommendations), ex=900)
     return recommendations
 
@@ -133,14 +70,12 @@ def update_profile_from_interaction(event: InteractionEvent) -> dict[str, Any]:
     if not matched_item:
         return profile
 
-    weight = {"view": 0.10, "like": 0.22, "complete": 0.30}.get(event.event_type, 0.08)
-    if event.rating is not None:
-        weight += event.rating / 25
-
-    profile["vector"] = [
-        round((current * (1 - weight)) + (incoming * weight), 4)
-        for current, incoming in zip(profile["vector"], matched_item["vector"])
-    ]
+    profile["vector"] = update_profile_vector(
+        profile["vector"],
+        matched_item["vector"],
+        event.event_type,
+        event.rating,
+    )
     profile["events"] = (profile.get("events", []) + [event.dict()])[-20:]
     save_profile(profile)
     rank_recommendations(event.user_id, event.context)
@@ -206,8 +141,19 @@ async def get_recommendations(user_id: int, context: str | None = None, limit: i
         "user_id": user_id,
         "model": "hybrid-content-vector-ranker-v0",
         "feature_store": "redis",
+        "profile": load_profile(user_id),
         "recommendations": recommendations[:limit],
     }
+
+
+@app.get("/profiles/{user_id}")
+async def get_profile(user_id: int) -> dict[str, Any]:
+    return load_profile(user_id)
+
+
+@app.get("/catalog")
+async def get_catalog() -> dict[str, Any]:
+    return {"items": ITEM_CATALOG, "count": len(ITEM_CATALOG)}
 
 
 @app.post("/events/interaction")
