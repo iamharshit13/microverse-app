@@ -2,3 +2,4 @@ Django
 djangorestframework
 djangorestframework-simplejwt
 kafka-python
+psycopg2-binary

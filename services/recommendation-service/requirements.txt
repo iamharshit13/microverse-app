@@ -2,3 +2,4 @@ fastapi
 uvicorn
 redis
 kafka-python
+psycopg2-binary

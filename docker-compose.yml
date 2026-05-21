@@ -1,6 +1,21 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: microverse
+      POSTGRES_USER: microverse
+      POSTGRES_PASSWORD: microverse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U microverse -d microverse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
@@ -36,8 +51,17 @@ services:
       - ./services/user-service:/app
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_ENGINE: postgres
+      DB_NAME: microverse
+      DB_USER: microverse
+      DB_PASSWORD: microverse
+      DB_HOST: postgres
+      DB_PORT: 5432
     depends_on:
-      - kafka
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
 
   recommendation-service:
     build: ./services/recommendation-service
@@ -51,9 +75,18 @@ services:
       REDIS_PORT: 6379
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       USER_EVENTS_TOPIC: user-events
+      DB_NAME: microverse
+      DB_USER: microverse
+      DB_PASSWORD: microverse
+      DB_HOST: postgres
+      DB_PORT: 5432
     depends_on:
-      - kafka
-      - redis
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      redis:
+        condition: service_started
 
   api-gateway:
     build: ./api-gateway
@@ -79,3 +112,6 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
+
+volumes:
+  postgres_data:

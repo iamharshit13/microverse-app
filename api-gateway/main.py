@@ -71,6 +71,15 @@ async def profile(user_id: int) -> Any:
     return await forward_json("GET", f"{RECOMMENDATION_SERVICE_URL}/profiles/{user_id}")
 
 
+@app.get("/api/history/{user_id}")
+async def history(user_id: int, limit: int = 10) -> Any:
+    return await forward_json(
+        "GET",
+        f"{RECOMMENDATION_SERVICE_URL}/history/{user_id}",
+        params={"limit": limit},
+    )
+
+
 @app.get("/api/catalog")
 async def catalog() -> Any:
     return await forward_json("GET", f"{RECOMMENDATION_SERVICE_URL}/catalog")

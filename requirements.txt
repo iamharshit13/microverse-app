@@ -6,3 +6,4 @@ uvicorn
 redis
 kafka-python
 httpx
+psycopg2-binary
